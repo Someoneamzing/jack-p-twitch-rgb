@@ -1,0 +1,25 @@
+{
+  "name": "jack-p-twitch-rgb",
+  "version": "1.0.0",
+  "description": "This repository is designed as both an example and a tutorial for setting up a RGB LED Strip that connects to Twitch Using [Node.js](https://nodejs.org/en/), [TMI.js](https://github.com/tmijs/tmi.js) and [Johnny Five](http://johnny-five.io/).\r It will go through the steps for installing everything you need from scratch from getting Node.JS installed through to how to connect to Twitch and create custom animations.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Someoneamzing/jack-p-twitch-rgb.git"
+  },
+  "author": "Jacob McEwan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Someoneamzing/jack-p-twitch-rgb/issues"
+  },
+  "homepage": "https://github.com/Someoneamzing/jack-p-twitch-rgb#readme",
+  "dependencies": {
+    "chroma-js": "^2.1.0",
+    "johnny-five": "^2.0.0",
+    "node-pixel": "^0.10.2",
+    "tmi.js": "^1.5.0"
+  }
+}
