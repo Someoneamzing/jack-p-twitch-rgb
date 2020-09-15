@@ -1,6 +1,6 @@
 const EventEmitter = require('events');
 const five = require('johnny-five');
-
+global.window = global
 class Strip extends EventEmitter {
   constructor({board, controller, strips, gamma, length}) {
     super();

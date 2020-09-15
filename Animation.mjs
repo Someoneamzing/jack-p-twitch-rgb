@@ -1,4 +1,5 @@
-const chroma = require('chroma-js');
+let chroma = (typeof window !== 'undefined'?window:global).chroma;
+if ((typeof window !== 'undefined'?window:global).module) chroma = require('chroma-js');
 
 class Animation {
   constructor(colors, ranges, looping = false, mode = 'lab') {
@@ -70,52 +71,74 @@ class Animation {
     this.colors = colors;
     this.totalTime = totalTime;
     this.timeToFadeOut = timeToFadeOut;
-    //We use cumulative time to figure out at what times each color stop occurs.
+    //We use cumulativeTime to figure out at what times each color stop occurs.
     let cumulativeTime = 0;
-    let finalColorStops = this.colors.reduce((acc, color)=>{
+    let finalColorStops = this.colors.reduce((acc, color)=>{//This will loop over each item in colors.
+      //Here acc is a list. We add each color from our color stops to it.
       acc.push(color.color);
+      //However, if this color is held for any amount of time we need to specify it twice to make a section of the gradient static.
       if (acc.holdTime > 0) acc.push(color.color);
+      //This line just passes acc to the next color stop.
       return acc;
-    }, [this.colors[this.colors.length-1].color])
-    let finalColorStopDomains = this.colors.reduce((acc, color)=>{
+    }, [this.colors[this.colors.length-1].color]) //Here we can add a starting element to acc. We have added the last color in the animation at the start to make looping easier. For non looping animations we can just skip the first fade on the first play.
+    let finalColorStopDomains = this.colors.reduce((acc, color)=>{ //Here we process the times for each color. We need to convert our relative times from colors to times in a timeline. To do that we add each colors fadeTime and holdTime to cumulativeTime and use that to figure out at what time each stop belongs.
       cumulativeTime += color.fadeInTime;
+      //Add the time of the color when it's fully faded in.
       acc.push(cumulativeTime);
       if (acc.holdTime > 0) {
+        //And if the color is held we need to add a time for when the color should start to fade to the next one.
         cumulativeTime += color.holdTime;
         acc.push(cumulativeTime);
       }
-      return acc;
-    }, [0])
+      return acc;//Again this line passes acc to the next color.
+    }, [0])//Here we start acc with 0 to make sure chroma doesn't cut off the beginning color from the loop we specified earlier.
+    //Now we can create the chroma scale that we will use to perform our fades. We specify the colors, times and the blending mode we want to use.
     this.scale = chroma.scale(finalColorStops).domain(finalColorStopDomains).mode(mode);
-    // this.startTime = Date.now();
+    //And we need to store the list of LED positions that we will change in this animation.
     this.leds = dedupedRangeList;
-    // this.startColors = Array.from(dedupedRangeList).reduce(
-    //     (map, index)=>{
-    //       map.set(index, strip.pixel(index).color());
-    //       return map;
-    //     }
-    //   , new Map()); //This gets the current color of all the LEDs we will change. We will use this to fade the starting color.
-    this.firstLoop = true; //We'll use this to determine if we should fade from startColors or the last color stop for looping animations.
+    this.firstLoop = true; //We'll use this to determine if we should fade from startColors or the last color for looping animations.
   }
 
-  hasPixel(index, time) {return this.looping || time < this.totalTime ? this.leds.has(parseInt(index).valueOf()) : false}
+  //This funtion will let us check if this animation is going to modify a particular LED.
+  hasPixel(index, time) {
+    //We get a time because animations shouldn't modify LEDs outside their timelines. It also allows for some expansions that we will talk about later.
+    //This makes a couple of checks. The first is if we are looping, becuasde if we are there is no end to the animation's timeline. The next check is if we aren't looping then if we are still in our timeline. (We aren't past the end of the animation.) If either of those checks passes then we check if our list of LEDs contains the requested index. If it does then we return true. If however, the first checks don't pass then we just reutrn false as we aren;t going to modify any LEDs.
+    return this.looping || time < this.totalTime ? this.leds.has(parseInt(index).valueOf()) : false
+  }
 
+  //This function will get the color for a particular LED at a particular time.
   getLEDColor(index, time) {
+    //First thing to check if this animation even has a color for this LED. If it doesnt then we just return null.
     if (!this.hasPixel(index, time)) return null;
-    return this.scale(time).alpha(
+    //To get the color we simply pass in the time in the animation to our chroma scale.
+    return this.scale(time).alpha(//However to allow fading we provide an alpha or 'opacity' if you will. We'll look at how we will use this in the AnimationManager but the maths is fairly simple.
+      //Our first check is if we are looping or not.
       this.looping?(
+        //If we are then we only want to fade at the very start, so we check if this is the first loop through.
         this.firstLoop?
+        //If it is the first loop then we return a number that goes from 0 to 1 as we fade in and stays at 1 for the rest of the loop.
           Math.min(1,time/this.colors[0].fadeInTime)
         :
+        //If this is not our first loop then just return 1 as the animation won't fade out again.
           1
       ):(
+        //If we aren't looping then our numbers are slightly different.
+        //Our first check is if we are fading out.
         time > this.timeToFadeOut?
+        //If we are we return a number that goes from 0 to 1 as we fade out.
           1 - (time-this.timeToFadeOut) / this.colors[this.colors.length-1].fadeOutTime
-        :
-          1
+        :(
+        //If we arent then we check if we are fading in
+          time < this.colors[0].fadeInTime?
+            //If we are then we return a number that goes from 0 to 1 as we fade in.
+            Math.min(1,time/this.colors[0].fadeInTime)
+          :
+            //If we 're after the fadeInTime then we just return 1 as the color is solid.
+            1
+        )
       )
     );
   }
 }
 
-module.exports = Animation;
+export default Animation;

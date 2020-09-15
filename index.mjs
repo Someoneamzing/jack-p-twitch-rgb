@@ -1,10 +1,11 @@
-const five = require("johnny-five");
-const pixel = require('node-pixel');
-const chroma = require('chroma-js');
-const tmi = require('tmi.js');
-const Strip = require('./test-helpers.js');
-const AnimationManager = require('./AnimationManager.js');
-const Animation = require('./Animation.js');
+global.window = global;
+import five from "johnny-five";
+import pixel from 'node-pixel';
+import chroma from 'chroma-js';
+import tmi from 'tmi.js';
+import Strip from './test-helpers.js';
+import AnimationManager from './AnimationManager.mjs';
+import Animation from './Animation.mjs';
 
 const STRIP_LENGTH = 2;
 const STRIP_PIN = 6;
@@ -45,8 +46,8 @@ board.on("ready", function() {
     ]
 
     board.repl.inject({
-      animate(index) {
-        animationManager.animate(animations[index]);
+      play(index) {
+        animationManager.play(animations[index]);
       }
     })
 
