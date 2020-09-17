@@ -338,3 +338,10 @@ strip.on('ready', ()=>{
 ```
 
 This does some basic flashes of a single color. For fading between colors and animations I have another guide that can explain the process of color animations. You can find that [here](./colors.md)
+
+## Closing Notes
+This repository contains code similar to that of the tutorial. It differs slightly as I have added a few extra animation types and also changed some of the imports to allow the use of this library in the browser to experiment with animations.
+
+I might make a tool in the future for editing animations, but for now it will just have to be done in code.
+
+If you wish to experiment with these tools I recommend following the rest of the tutorial so you know how the animations are set up and what extra features are provided. The instructions for accessing these tools is on the last page of the tutorial.
