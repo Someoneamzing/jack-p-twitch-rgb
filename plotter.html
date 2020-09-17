@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Plotter</title>
+    <style media="screen">
+      canvas {
+        width: 100%;
+        height: 50vh;
+        border: 1px solid grey;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas" width="300" height="300"></canvas>
+    <input type="number" id="min" value="0"><input type="number" id="max" value="10"><input type="number" id="step" value=".1">
+    <textarea id="input" rows="8" cols="80"></textarea>
+    <button id="plot">Plot</button>
+    <script src="./plotter.js" charset="utf-8"></script>
+  </body>
+</html>

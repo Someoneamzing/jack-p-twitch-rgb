@@ -5,7 +5,7 @@ import chroma from 'chroma-js';
 import tmi from 'tmi.js';
 import Strip from './test-helpers.js';
 import AnimationManager from './AnimationManager.mjs';
-import Animation from './Animation.mjs';
+import SimpleAnimation from './SimpleAnimation.mjs';
 
 const STRIP_LENGTH = 2;
 const STRIP_PIN = 6;
@@ -30,15 +30,15 @@ board.on("ready", function() {
     let animationManager = new AnimationManager(strip);
 
     let animations = [
-      new Animation([
+      new SimpleAnimation([
         { color: [0, 255, 255], fadeInTime: 1000, holdTime: 0 },
         { color: [255, 0, 0], fadeInTime: 1000, holdTime: 0 }
       ], '0 1', true, 'hsv'),
-      new Animation([
+      new SimpleAnimation([
         { color: [255, 0, 0], fadeInTime: 500, holdTime: 500 },
         { color: [255, 163, 15], fadeInTime: 500, holdTime: 1000, fadeOutTime: 500 }
       ], '0', false),
-      new Animation([
+      new SimpleAnimation([
         { color: chroma.hsv(0, 100, 100), fadeInTime: 10, holdTime: 0},
         { color: chroma.hsv(180, 100, 100), fadeInTime: 1000, holdTime: 0},
         { color: chroma.hsv(360, 100, 100), fadeInTime: 1000, holdTime: 0, fadeOutTime: 10},
